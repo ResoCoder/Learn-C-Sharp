@@ -1,96 +1,87 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 
 namespace LearnCSharp
 {
-    interface IWalking
-    {
-        void Walk();
-    }
-
-    class Animal : IWalking
-    {
-        public void Walk()
-        {
-            Console.WriteLine("I walked 5000 meters");
-        }
-    }
-
-    class Person : IWalking
-    {
-        public double Height;
-        public double Weight;
-        public string HairColor;
-        protected bool HasUnderwear;
-
-        public Person(double height, double weight, string hairColor, bool hasUnderwear)
-        {
-            Height = height;
-            Weight = weight;
-            HairColor = hairColor;
-            HasUnderwear = hasUnderwear;
-        }
-
-        public Person(double height, double weight, string hairColor)
-            : this(height, weight, hairColor, true)
-        {
-
-        }
-
-        public virtual void Talk()
-        {
-            Console.WriteLine("I am a person. Nice to meet you!");
-        }
-
-        public void Walk()
-        {
-            Console.WriteLine("I walked 1000 meters");
-        }
-    }
-
-    class Programmer : Person
-    {
-        public string FavoriteProgrammingLanguage;
-
-        public Programmer(double height, double weight, string hairColor, bool hasUnderwear,
-            string favLang)
-            : base(height, weight, hairColor, hasUnderwear)
-        {
-            FavoriteProgrammingLanguage = favLang;
-        }
-
-        public override void Talk()
-        {
-            base.Talk();
-            Console.WriteLine($"I like {FavoriteProgrammingLanguage} and I have underwear = {HasUnderwear}");
-        }
-    }
-
     class Program
     {
         static void Main(string[] args)
         {
-            Programmer Jeff = new Programmer(179, 80, "black", false, "C#");
-            //Jeff.Walk();
+            int[] integers = new int[] { 1, 2, 3, 4, 5 };
+            Console.WriteLine(ConcatenateArray(integers));
 
-            Person Paul = new Person(160, 50, "green");
-            //Paul.Walk();
+            char[] characters = new char[] { 'a', 'b', 'c', 'd', 'e' };
+            Console.WriteLine(ConcatenateArray(characters));
 
-            Person[] people = new Person[3];
-            people[0] = Jeff;
-            people[1] = Paul;
+            List<string> strings = new List<string>() { "hello", "everyone" };
+            Console.WriteLine(ConcatenateCollection(strings));
+            Console.WriteLine(ConcatenateCollection(characters));
 
-            //people[0].Walk();
-            //people[1].Walk();
-
-            IWalking[] creatures = new IWalking[3];
-            creatures[0] = Jeff;
-            creatures[1] = Paul;
-            creatures[2] = new Animal();
-
-            foreach (var creature in creatures)
-                creature.Walk();
+            var holder = new TwoCollectionHolder<List<string>, int[]>(strings, integers);
+            Console.WriteLine(holder.ToConcatenatedString());
+            Console.WriteLine(holder.GetTypeOfCollections());
 
             Console.ReadLine();
         }
+
+        static string ConcatenateIntArray(int[] array)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in array)
+                sb.Append(item);
+            return sb.ToString();
+        }
+
+        static string ConcatenateCharArray(char[] array)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in array)
+                sb.Append(item);
+            return sb.ToString();
+        }
+
+        static string ConcatenateArray<T>(T[] array)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in array)
+                sb.Append(item);
+            return sb.ToString();
+        }
+
+        static string ConcatenateCollection<T>(T collection) where T : IList
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in collection)
+                sb.Append(item);
+            return sb.ToString();
+        }
+    }
+
+    class TwoCollectionHolder<T, U> where T : IList where U : IList
+    {
+        private T collection1;
+        private U collection2;
+
+        public TwoCollectionHolder(T c1, U c2)
+        {
+            collection1 = c1;
+            collection2 = c2;
+        }
+
+        public string ToConcatenatedString()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in collection1)
+                sb.Append(item);
+            foreach (var item in collection2)
+                sb.Append(item);
+            return sb.ToString();
+        }
+
+        public Tuple<Type, Type> GetTypeOfCollections() => new Tuple<Type, Type>(typeof(T), typeof(U));
+
+        private T CompletelyNotUsefulMethod() => collection1;
     }
 }
